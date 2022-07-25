@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Piper PA-18 Super Cub</title>
+        <style>
+			body { margin: 0; }
+		</style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="/base.css">
+    </head>
+    <body>
+    
+    <!-- Customize section -->
+
+    <div id="product-customize">
+        <div id="price">
+            <label for="price" id="price">Precio Total:  </label>
+            <label for="price-value" id="price-value"></label>
+        </div>
+        <div class="option">
+            <label for="color">Color: </label>
+            <input type="color" id="colorpicker" value="#ffffff"/>
+        </div>
+            
+        <div class="dropdown">
+            <div class="selectbox">
+                <div class="select">
+                    <div class="content-select">
+                        <img src="/img/select-img-glass-texture2.png">
+                        <div class="text">
+                            <h1 class="title">Wheel type</h1>
+                        </div>  
+                    </div>
+                    <i class="fa-solid fa-angle-down"></i>
+                </div>
+    
+                <!-- wheel options -->
+                <div class="options">
+                    <a href="#" class="option-select">
+                        <div class="content-option">
+                            <img src="/img/select-img-wheel-texture1.png">
+                            <div class="text">
+                                <h2 class="title">Ground destroyer 1</h2>
+                            </div>                        
+                        </div>
+                    </a>
+                    <a href="#" class="option-select">
+                        <div class="content-option">
+                            <img src="/img/select-img-wheel-texture2.png">
+                            <div class="text">
+                                <h2 class="title">Ground destroyer 2</h2>
+                            </div>                        
+                        </div>
+                    </a>
+                    <a href="#" class="option-select">
+                        <div class="content-option">
+                            <img src="/img/select-img-wheel-texture3.png">
+                            <div class="text">
+                                <h2 class="title">Fire</h2>
+                            </div>                        
+                        </div>
+                    </a>                    
+                </div>
+            </div>            
+            
+            <input type="hidden" name="wheel" id="inputSelect1" value="">
+    
+            <div class="selectbox">
+                <div class="select2">
+                    <div class="content-select">
+                        <img src="/img/select-img-glass-texture2.png">
+                        <div class="text">
+                            <h1 class="title">Glass type</h1>
+                        </div>                              
+                    </div>
+                    <i class="fa-solid fa-angle-down"></i>
+                </div>
+    
+                <!-- glass options -->
+                <div class="options2">
+                    <a href="#" class="option-select">
+                        <div class="content-option">
+                            <img src="/img/select-img-glass-texture.png">
+                            <div class="text">
+                                <h2 class="title">Transparent glass</h2>
+                            </div>                        
+                        </div>
+                    </a>
+                    <a href="#" class="option-select">
+                        <div class="content-option">
+                            <img src="/img/select-img-glass-texture2.png">
+                            <div class="text">
+                                <h2 class="title">Dark glass</h2>
+                            </div>                        
+                        </div>
+                    </a>
+                </div>
+            </div>
+    
+            <input type="hidden" name="glass" id="inputSelect2" value="">
+    
+        </div>         
+       
+        <div class="logo">
+            <img src="/img/logo.jpg">
+        </div>
+    </div>
+
+    <button onClick="refreshPage()">Reset</button>
+        
+    <!-- Treejs canvas -->
+    <script src="/js/three.js"></script>
+    <script src="/js/OrbitControls.js"></script>
+    <script src="/js/OBJLoader.js"></script>
+
+    <script>  
+
+        //Function for audio
+
+        var moneySound = (function() {
+        return function() {
+            var audio = new Audio("/audio/MoneySound.mp3");
+
+            audio.oncanplaythrough = function(){
+            audio.play();
+            }
+
+            audio.loop = false;
+
+            audio.onended = function(){
+            }
+        };
+        })();   
+        
+        //Function for audio - end
+
+        //Function for button refresh
+        function refreshPage(){
+        window.location.reload();
+    }
+
+        //Function for button refresh - end
+
+        //Variables for price
+        let totalPriceText = document.getElementById('price-value');
+        let basePrice = 330000000;
+        let colorPrice = 50000000;
+        let wheelPrice = 100000000;
+        let glassPrice = 80000000;  
+        //Variables for price - end
+
+        //Setting up scene camera and renderer
+        //Background
+        const params = {
+                      color: '#2c494d'
+            };
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color (params.color);
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth/2.2, window.innerHeight/1.2 );
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.BasicShadowMap;
+        document.body.appendChild( renderer.domElement );
+
+        //Setting up scene camera and renderer - end
+            
+        //Degrees
+        const deg = Math.PI/180;
+        //Degrees - end            
+
+        //Textures
+
+        const texture1 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/piper_diffuse.jpg');
+        texture1.wrapS = THREE.RepeatWrapping; 
+        texture1.wrapT = THREE.RepeatWrapping; 
+        
+        const texture2 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/piper_bump.jpg');
+        texture2.wrapS = THREE.RepeatWrapping; 
+        texture2.wrapT = THREE.RepeatWrapping; 
+        
+        const texture3 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/piper_refl.jpg');
+        texture3.wrapS = THREE.RepeatWrapping; 
+        texture3.wrapT = THREE.RepeatWrapping; 
+        
+        const texture4 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/glassTexture.jpg');
+        texture4.wrapS = THREE.RepeatWrapping; 
+        texture4.wrapT = THREE.RepeatWrapping; 
+
+        const wheelTexture1 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/istockphoto-1028085950-170667a.jpg');
+        wheelTexture1.wrapS = THREE.RepeatWrapping; 
+        wheelTexture1.wrapT = THREE.RepeatWrapping; 
+
+        const wheelTexture2 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/wheelTexture2.jpg');
+        wheelTexture2.wrapS = THREE.RepeatWrapping; 
+        wheelTexture2.wrapT = THREE.RepeatWrapping; 
+
+        const wheelTexture3 = new THREE.TextureLoader().load('/textures/3. piper_pa18_Supercub/wheelTexture3.jpg');
+        wheelTexture3.wrapS = THREE.RepeatWrapping; 
+        wheelTexture3.wrapT = THREE.RepeatWrapping; 
+        wheelTexture3.repeat.set(20, 20);
+
+        const planeTexture = new THREE.TextureLoader().load('/textures/planeTexture1.jpg');
+        planeTexture.wrapS = THREE.RepeatWrapping; 
+        planeTexture.wrapT = THREE.RepeatWrapping;
+        planeTexture.repeat.set(1.5, 3);
+        
+        //Textures - end
+
+         //Room Box
+                
+                //Vertical plane
+                const planeGeometry = new THREE.PlaneGeometry( 100, 100 );
+                const planeMaterial = new THREE.MeshPhongMaterial( {map: planeTexture, side: THREE.DoubleSide} );
+                const vPlane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( vPlane );
+                vPlane.receiveShadow = true;
+                vPlane.position.z = -15;
+
+                //Vertical plane 2
+                const v2Plane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( v2Plane );
+                v2Plane.receiveShadow = true;
+                v2Plane.position.z = 15;
+
+                //Horizontal plane
+                const hPlane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( hPlane );
+                hPlane.receiveShadow = true;
+                hPlane.rotation.x = deg*-90;
+                hPlane.position.y = -10;
+
+                //Horizontal plane 2
+                const h2Plane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( h2Plane );
+                h2Plane.receiveShadow = true;
+                h2Plane.rotation.x = deg*-90;
+                h2Plane.position.y = 10;
+
+                //Side plane
+                const sPlane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( sPlane );
+                sPlane.receiveShadow = true;
+                sPlane.rotation.y = deg*-90;
+                sPlane.position.y = -5;
+                sPlane.position.x = 14;
+
+                //Side plane 2
+                const s2Plane = new THREE.Mesh( planeGeometry, planeMaterial );
+                scene.add( s2Plane );
+                s2Plane.receiveShadow = true;
+                s2Plane.rotation.y = deg*-90;
+                s2Plane.position.y = -5;
+                s2Plane.position.x = -14;
+
+                //Room Box - end
+
+
+        //Starts here
+        
+        // instantiate a loader
+        const loader = new THREE.OBJLoader();
+
+        // load a resource
+        loader.load(
+            // resource URL
+            '/3DModels/piper_pa18.obj',
+            // called when resource is loaded
+            function ( object ) {
+
+                console.log(object);
+                scene.add( object); 
+                setInterval(function () {object.rotation.y += -0.003});   
+                
+                const select = document.querySelector('.select');
+                const options = document.querySelector('.options');
+                const contentSelect = document.querySelector('.select .content-select');
+                const contentSelect2 = document.querySelector('.select2 .content-select');
+                const hiddenInput1 = document.querySelector('#inputSelect1');
+                const hiddenInput2 = document.querySelector('#inputSelect2');
+                const colorPicker = document.querySelector('#colorpicker');				
+                let dollarUSLocale = Intl.NumberFormat('en-US');
+                let totalPriceTextMoney = "$" + String(dollarUSLocale.format(basePrice));
+                totalPriceText.innerHTML = totalPriceTextMoney;
+                                
+
+                // var colorCode;         
+                
+                colorPicker.onchange = function(){                    
+                    for (let i = 0; i <= 191; i++) {
+                    object.children[i].material.color.set(this.value);                    
+                    }
+                    changeColorPrice();
+                    moneySound();
+                }
+
+                //will do nothing when called more than once
+                var changeColorPrice = (function() {
+                var executed = false;
+                return function() {
+                    if (!executed) {
+                        executed = true;
+                        basePrice += colorPrice;
+                        totalPriceTextMoney= "$" + String(dollarUSLocale.format(basePrice));
+                        totalPriceText.innerHTML = totalPriceTextMoney;
+                    }
+                };
+                })();
+                //End of function
+
+                //will do nothing when called more than once
+                var changeWheelPrice = (function() {
+                var executed = false;
+                return function() {
+                    if (!executed) {
+                        executed = true;
+                        basePrice += wheelPrice;
+                        totalPriceTextMoney= "$" + String(dollarUSLocale.format(basePrice));
+                        totalPriceText.innerHTML = totalPriceTextMoney;
+                    }
+                };
+                })();
+                //End of function
+
+                //will do nothing when called more than once
+                var changeGlassPrice = (function() {
+                var executed = false;
+                return function() {
+                    if (!executed) {
+                        executed = true;
+                        basePrice += glassPrice;
+                        totalPriceTextMoney= "$" + String(dollarUSLocale.format(basePrice));
+                        totalPriceText.innerHTML = totalPriceTextMoney;
+                    }
+                };
+                })();
+                //End of function
+
+                document.querySelectorAll('.options > .option-select').forEach((option) => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const selectedOption = e.currentTarget.querySelector('.title').innerText;
+                        changeWheelPrice();
+                        moneySound();
+
+                        contentSelect.innerHTML = e.currentTarget.innerHTML;
+                        select.classList.toggle('active');
+                        options.classList.toggle('active');
+                        hiddenInput1.value = e.currentTarget.querySelector('.title').innerText;
+
+                        if(selectedOption == "Ground destroyer 1") {
+                            for (let i = 81; i <= 81; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture1, side: THREE.DoubleSide
+                            });}
+                            for (let i = 104; i <= 104; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture1, side: THREE.DoubleSide
+                            });}
+                            for (let i = 113; i <= 113; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture1, side: THREE.DoubleSide
+                            });}              
+
+                        }
+                        else if (selectedOption == "Ground destroyer 2"){
+                            for (let i = 81; i <= 81; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture2, side: THREE.DoubleSide
+                            });}
+                            for (let i = 104; i <= 104; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture2, side: THREE.DoubleSide
+                            });}
+                            for (let i = 113; i <= 113; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture2, side: THREE.DoubleSide
+                            });}
+                        }
+                        else {
+                            for (let i = 81; i <= 81; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture3, side: THREE.DoubleSide
+                            });}
+                            for (let i = 104; i <= 104; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture3, side: THREE.DoubleSide
+                            });}
+                            for (let i = 113; i <= 113; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: wheelTexture3, side: THREE.DoubleSide
+                            });}
+                        }
+
+                    });
+                });
+
+                select.addEventListener('click', () => {
+                    select.classList.toggle('active');
+                    options.classList.toggle('active');
+                });
+
+                const select2 = document.querySelector('.select2');
+                const options2 = document.querySelector('.options2');
+
+                document.querySelectorAll('.options2 > .option-select').forEach((option) => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const selectedOption2 = e.currentTarget.querySelector('.title').innerText;
+                        changeGlassPrice();
+                        moneySound();
+
+                        contentSelect2.innerHTML = e.currentTarget.innerHTML;
+                        select2.classList.toggle('active');
+                        options2.classList.toggle('active');
+                        hiddenInput2.value = e.currentTarget.querySelector('.title').innerText;
+
+                        if(selectedOption2 == "Transparent glass"){
+                            for (let i = 161; i <= 162; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: texture4, side: THREE.DoubleSide 
+                            });}
+                        }
+                        else {
+                            for (let i = 161; i <= 162; i++) {
+                            object.children[i].material = new THREE.MeshPhongMaterial({
+                            map: texture3, side: THREE.DoubleSide 
+                            });}
+                        }
+
+                    });
+                });
+
+                select2.addEventListener('click', () => {
+                    select2.classList.toggle('active');
+                    options2.classList.toggle('active');
+                });
+
+                //End of main js paste
+                               
+
+                for (let i = 0; i <= 191; i++) {
+                object.children[i].material = new THREE.MeshPhongMaterial({
+                map: texture1, bumpMap:texture2, side: THREE.DoubleSide
+                });
+
+                // Casting shadows
+                object.children[i].castShadow = true;
+
+                //Rotation
+                object.children[i].rotation.x = deg *20;
+                object.children[i].rotation.y = deg *-60;
+                object.children[i].position.y = -1;
+
+                //Wind shields                        
+                
+                for (let i = 161; i <= 162; i++) {
+                object.children[i].material = new THREE.MeshPhongMaterial({
+                map: texture3, side: THREE.DoubleSide //blue texture name: texture4
+                });}
+
+            }     
+            },
+            // called when loading is in progresses
+            function ( xhr ) {
+
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            // called when loading has errors
+            function ( error ) {
+
+                console.log( 'An error happened' );
+
+            }
+        );
+
+        //Ends here
+
+        //Lights
+
+        //AmbientLight
+        const ambientLight = new THREE.AmbientLight(0xffffff, .6); 
+        scene.add( ambientLight );
+
+        //PointLight
+        const pointLight = new THREE.PointLight( 0xffffff, .8, 100 );
+        pointLight.position.set( -4, 10, 10 );
+        scene.add( pointLight );
+        pointLight.castShadow = true;
+
+
+        //PointLightHelper
+        // const sphereSize = 1;
+        // const pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+        // scene.add( pointLightHelper );
+
+        //Lights - end
+
+        //Orbit controls
+        let orbitControl = new THREE.OrbitControls( camera, renderer.domElement );
+        //Orbit controls - end
+
+        camera.position.set( 0, 0, 9 );
+
+        //Animate function
+        function animate() {
+            requestAnimationFrame( animate );
+            orbitControl.update();  
+            renderer.render( scene, camera );
+        };
+
+        animate();
+        //Animate function - end
+        
+    </script>
+
+    </body>
+</html>
